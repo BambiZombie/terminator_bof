@@ -10,9 +10,6 @@
 
 该工具只用于个人学习，请勿用于非法用途，请遵守网络安全法，否则后果作者概不负责。
 
-### 演示效果
-删了
-
 ### 参考
 https://github.com/ZeroMemoryEx/Terminator
 
